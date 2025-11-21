@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Pipeline Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0E0E0F;
+            color: #FFFFFF;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .nav {
+            background: #1A1B1F;
+            border-bottom: 1px solid rgba(0, 201, 242, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .nav-link {
+            font-size: 12px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #BFC4C9;
+            text-decoration: none;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: #00C9F2;
+        }
+
+        .nav-link.active {
+            color: #00C9F2;
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #00C9F2;
+            box-shadow: 0 0 8px rgba(0, 201, 242, 0.5);
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+            width: 100%;
+        }
+
+        .hero {
+            padding: 50px 0 5px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 48px;
+            font-weight: 300;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            color: #FFFFFF;
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            font-weight: 400;
+            color: #BFC4C9;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .cards-section {
+            padding: 60px 0 120px;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+
+        .card {
+            background: #1A1B1F;
+            border: 1px solid rgba(191, 196, 201, 0.1);
+            border-radius: 8px;
+            padding: 40px 32px;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 201, 242, 0.02) 0%, rgba(17, 224, 193, 0.02) 100%);
+            opacity: 0;
+            transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover {
+            border-color: rgba(0, 201, 242, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            font-size: 24px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+            margin-bottom: 12px;
+        }
+
+        .card-description {
+            font-size: 13px;
+            font-weight: 300;
+            color: #BFC4C9;
+            line-height: 1.6;
+            letter-spacing: 0.5px;
+        }
+
+        .card-features {
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .feature-item {
+            font-size: 12px;
+            font-weight: 400;
+            color: #BFC4C9;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(191, 196, 201, 0.05);
+            letter-spacing: 0.5px;
+        }
+
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+
+        .card-action {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid #00C9F2;
+            color: #00C9F2;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-button:hover {
+            background: rgba(0, 201, 242, 0.1);
+            box-shadow: 0 0 16px rgba(0, 201, 242, 0.2);
+        }
+
+        .card-accent {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00C9F2, transparent);
+            opacity: 0;
+            transition: opacity 200ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card:hover .card-accent {
+            opacity: 1;
+        }
+
+        @media (max-width: 1200px) {
+            .cards-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 20px;
+            }
+
+            .nav {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .hero {
+                padding: 80px 0 60px;
+            }
+
+            .hero-title {
+                font-size: 32px;
+                letter-spacing: 2px;
+            }
+
+            .cards-section {
+                padding: 40px 0 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-brand">ANALYTICS PLATFORM</div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active">DATASETS</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container">
+            <h1 class="hero-title">Data Analytics Suite</h1>
+            <p class="hero-subtitle">CalcMate: Math Word Problem Solver</p>
+        </div>
+    </section>
+
+    <section class="cards-section">
+        <div class="container">
+            <div class="cards-grid">
+                <div class="card">
+                    <div class="card-accent"></div>
+                    <div class="card-header">
+                        <h2 class="card-title">Pipeline Diagnostics</h2>
+                        <p class="card-description">Pipeline success funnel & stage-wise performance analytics. Topic/difficulty impact analysis with timing distributions. Model version comparisons with error analysis & correlation heatmaps</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="/pipeline" class="card-button">
+                            EXPLORE DATA
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-accent"></div>
+                    <div class="card-header">
+                        <h2 class="card-title">User Interactions</h2>
+                        <p class="card-description">Study patterns vs accuracy correlations & learning style analysis. Time/day performance heatmaps with student progress tracking. Response time distributions & predictive success modeling</p>
+                    </div>
+                    <div class="card-action">
+                        <a href="/interactions" class="card-button">
+                            EXPLORE DATA
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-accent"></div>
+                    <div class="card-header">
+                        <h2 class="card-title">Problem Bank Analytics</h2>
+                        <p class="card-description">Complexity vs success rate analysis across difficulty levels. Topic performance comparisons & problem source benchmarking. Solving time predictions & success rate distribution analytics</p>
+                    </div>
+                    
+                    <div class="card-action">
+                        <a href="/problem_bank" class="card-button">
+                            EXPLORE DATA
+                            <span>→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+</html>
