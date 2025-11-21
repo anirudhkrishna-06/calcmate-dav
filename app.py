@@ -6,27 +6,56 @@ import os
 sys.path.append('visualizations')
 
 from visualizations.pipeline_viz import PipelineVisualizer
+from visualizations.user_interactions_viz import UserInteractionsVisualizer
+from visualizations.problem_bank_viz import ProblemBankVisualizer
 
 app = Flask(__name__)
 
-# Global variable to store analysis results (in production, use caching)
-analysis_results = {}
+# Global variables to store analysis results
+pipeline_results = {}
+interactions_results = {}
+problem_bank_results = {}
 
 def run_pipeline_analysis():
     """Run the pipeline analysis and cache results"""
-    global analysis_results
-    
+    global pipeline_results
     try:
         visualizer = PipelineVisualizer('static/datasets/pipeline_diagnostics.csv')
         results = visualizer.run_complete_analysis()
-        
         if results:
-            analysis_results = results
+            pipeline_results = results
             return True
-        else:
-            return False
+        return False
     except Exception as e:
         print(f"Error in pipeline analysis: {e}")
+        return False
+
+def run_interactions_analysis():
+    """Run the user interactions analysis and cache results"""
+    global interactions_results
+    try:
+        visualizer = UserInteractionsVisualizer('static/datasets/user_interactions.csv')
+        results = visualizer.run_complete_analysis()
+        if results:
+            interactions_results = results
+            return True
+        return False
+    except Exception as e:
+        print(f"Error in interactions analysis: {e}")
+        return False
+
+def run_problem_bank_analysis():
+    """Run the problem bank analysis and cache results"""
+    global problem_bank_results
+    try:
+        visualizer = ProblemBankVisualizer('static/datasets/problem_bank.csv')
+        results = visualizer.run_complete_analysis()
+        if results:
+            problem_bank_results = results
+            return True
+        return False
+    except Exception as e:
+        print(f"Error in problem bank analysis: {e}")
         return False
 
 @app.route('/')
@@ -34,85 +63,228 @@ def index():
     """Main landing page"""
     return render_template('index.html')
 
+# ==================== PIPELINE DIAGNOSTICS ROUTES ====================
+
 @app.route('/pipeline')
 def pipeline_dashboard():
     """Main pipeline diagnostics dashboard"""
-    # Run analysis if not already done
-    if not analysis_results:
+    if not pipeline_results:
         success = run_pipeline_analysis()
         if not success:
-            return "Error running analysis", 500
+            return "Error running pipeline analysis", 500
     
     return render_template(
         'pipeline.html',
-        overview=analysis_results['overview'],
-        eda=analysis_results['eda'],
-        visuals=analysis_results['visuals'],
-        insights=analysis_results['insights']
+        overview=pipeline_results['overview'],
+        eda=pipeline_results['eda'],
+        visuals=pipeline_results['visuals'],
+        insights=pipeline_results['insights']
     )
 
 @app.route('/pipeline/regression')
 def pipeline_regression():
-    """Detailed regression analysis page"""
-    if not analysis_results:
+    """Detailed regression analysis page for pipeline"""
+    if not pipeline_results:
         success = run_pipeline_analysis()
         if not success:
-            return "Error running analysis", 500
+            return "Error running pipeline analysis", 500
     
     return render_template(
         'pipeline_regression.html',
-        overview=analysis_results['overview'],
-        regression=analysis_results['regression'],
-        regression_plot=analysis_results['visuals']['regression_plot']
+        overview=pipeline_results['overview'],
+        regression=pipeline_results['regression'],
+        regression_plot=pipeline_results['visuals']['regression_plot']
     )
 
 @app.route('/pipeline/hypothesis')
 def pipeline_hypothesis():
-    """Detailed hypothesis testing page"""
-    if not analysis_results:
+    """Detailed hypothesis testing page for pipeline"""
+    if not pipeline_results:
         success = run_pipeline_analysis()
         if not success:
-            return "Error running analysis", 500
+            return "Error running pipeline analysis", 500
     
     return render_template(
         'pipeline_hypothesis.html',
-        overview=analysis_results['overview'],
-        hypothesis=analysis_results['hypothesis'],
-        hypothesis_plot=analysis_results['visuals']['hypothesis_plot']
+        overview=pipeline_results['overview'],
+        hypothesis=pipeline_results['hypothesis'],
+        hypothesis_plot=pipeline_results['visuals']['hypothesis_plot']
     )
 
-@app.route('/api/pipeline/refresh')
-def refresh_analysis():
-    """API endpoint to refresh analysis"""
-    global analysis_results
-    analysis_results = {}  # Clear cache
+# ==================== USER INTERACTIONS ROUTES ====================
+
+@app.route('/interactions')
+def interactions_dashboard():
+    """Main user interactions dashboard"""
+    if not interactions_results:
+        success = run_interactions_analysis()
+        if not success:
+            return "Error running interactions analysis", 500
     
-    success = run_pipeline_analysis()
-    if success:
-        return jsonify({"status": "success", "message": "Analysis refreshed"})
+    return render_template(
+        'user_interactions.html',
+        overview=interactions_results['overview'],
+        eda=interactions_results['eda'],
+        visuals=interactions_results['visuals'],
+        insights=interactions_results['insights']
+    )
+
+@app.route('/interactions/regression')
+def interactions_regression():
+    """Detailed predictive modeling page for interactions"""
+    if not interactions_results:
+        success = run_interactions_analysis()
+        if not success:
+            return "Error running interactions analysis", 500
+    
+    return render_template(
+        'user_interactions_regression.html',
+        overview=interactions_results['overview'],
+        regression=interactions_results['regression'],
+        confusion_matrix=interactions_results['visuals']['confusion_matrix'],
+        feature_importance=interactions_results['visuals']['feature_importance']
+    )
+
+@app.route('/interactions/hypothesis')
+def interactions_hypothesis():
+    """Detailed hypothesis testing page for interactions"""
+    if not interactions_results:
+        success = run_interactions_analysis()
+        if not success:
+            return "Error running interactions analysis", 500
+    
+    return render_template(
+        'user_interactions_hypothesis.html',
+        overview=interactions_results['overview'],
+        hypothesis=interactions_results['hypothesis'],
+        hypothesis_plot=interactions_results['visuals']['hypothesis_plot']
+    )
+
+# ==================== PROBLEM BANK ROUTES ====================
+
+@app.route('/problem_bank')
+def problem_bank_dashboard():
+    """Main problem bank dashboard"""
+    if not problem_bank_results:
+        success = run_problem_bank_analysis()
+        if not success:
+            return "Error running problem bank analysis", 500
+    
+    return render_template(
+        'problem_bank.html',
+        overview=problem_bank_results['overview'],
+        eda=problem_bank_results['eda'],
+        visuals=problem_bank_results['visuals'],
+        insights=problem_bank_results['insights']
+    )
+
+@app.route('/problem_bank/regression')
+def problem_bank_regression():
+    """Detailed regression analysis page for problem bank"""
+    if not problem_bank_results:
+        success = run_problem_bank_analysis()
+        if not success:
+            return "Error running problem bank analysis", 500
+    
+    return render_template(
+        'problem_bank_regression.html',
+        overview=problem_bank_results['overview'],
+        regression=problem_bank_results['regression'],
+        actual_predicted=problem_bank_results['visuals']['regression_actual_predicted'],
+        coefficients=problem_bank_results['visuals']['regression_coefficients']
+    )
+
+@app.route('/problem_bank/hypothesis')
+def problem_bank_hypothesis():
+    """Detailed hypothesis testing page for problem bank"""
+    if not problem_bank_results:
+        success = run_problem_bank_analysis()
+        if not success:
+            return "Error running problem bank analysis", 500
+    
+    return render_template(
+        'problem_bank_hypothesis.html',
+        overview=problem_bank_results['overview'],
+        hypothesis=problem_bank_results['hypothesis'],
+        hypothesis_plot=problem_bank_results['visuals']['hypothesis_plot']
+    )
+
+# ==================== API ENDPOINTS ====================
+
+@app.route('/api/refresh-all')
+def refresh_all_analyses():
+    """API endpoint to refresh all analyses"""
+    global pipeline_results, interactions_results, problem_bank_results
+    
+    pipeline_results = {}
+    interactions_results = {}
+    problem_bank_results = {}
+    
+    pipeline_success = run_pipeline_analysis()
+    interactions_success = run_interactions_analysis()
+    problem_bank_success = run_problem_bank_analysis()
+    
+    if pipeline_success and interactions_success and problem_bank_success:
+        return jsonify({
+            "status": "success", 
+            "message": "All analyses refreshed successfully"
+        })
     else:
-        return jsonify({"status": "error", "message": "Analysis failed"}), 500
+        return jsonify({
+            "status": "partial",
+            "message": f"Pipeline: {'✓' if pipeline_success else '✗'}, "
+                      f"Interactions: {'✓' if interactions_success else '✗'}, "
+                      f"Problem Bank: {'✓' if problem_bank_success else '✗'}"
+        }), 500
 
 @app.route('/api/pipeline/stats')
 def get_pipeline_stats():
     """API endpoint to get pipeline statistics"""
-    if not analysis_results:
-        return jsonify({"status": "error", "message": "No analysis data"}), 404
-    
-    return jsonify({
-        "status": "success",
-        "data": {
-            "overview": analysis_results['overview'],
-            "regression": analysis_results['regression'],
-            "hypothesis": analysis_results['hypothesis']
-        }
-    })
+    if not pipeline_results:
+        return jsonify({"status": "error", "message": "No pipeline data"}), 404
+    return jsonify({"status": "success", "data": pipeline_results['overview']})
+
+@app.route('/api/interactions/stats')
+def get_interactions_stats():
+    """API endpoint to get interactions statistics"""
+    if not interactions_results:
+        return jsonify({"status": "error", "message": "No interactions data"}), 404
+    return jsonify({"status": "success", "data": interactions_results['overview']})
+
+@app.route('/api/problem_bank/stats')
+def get_problem_bank_stats():
+    """API endpoint to get problem bank statistics"""
+    if not problem_bank_results:
+        return jsonify({"status": "error", "message": "No problem bank data"}), 404
+    return jsonify({"status": "success", "data": problem_bank_results['overview']})
 
 if __name__ == '__main__':
-    # Run initial analysis when app starts
+    # Run initial analyses when app starts
     print("🚀 Starting Flask application...")
-    print("📊 Running initial pipeline analysis...")
-    run_pipeline_analysis()
+    print("=" * 70)
+    
+    print("\n📊 Dataset 1: Running Pipeline Diagnostics analysis...")
+    if run_pipeline_analysis():
+        print("✅ Pipeline analysis completed successfully!")
+    else:
+        print("❌ Pipeline analysis failed!")
+    
+    print("\n👥 Dataset 2: Running User Interactions analysis...")
+    if run_interactions_analysis():
+        print("✅ Interactions analysis completed successfully!")
+    else:
+        print("❌ Interactions analysis failed!")
+    
+    print("\n📚 Dataset 3: Running Problem Bank analysis...")
+    if run_problem_bank_analysis():
+        print("✅ Problem Bank analysis completed successfully!")
+    else:
+        print("❌ Problem Bank analysis failed!")
+    
+    print("\n" + "=" * 70)
+    print("🌐 Starting Flask server...")
+    print("📍 Navigate to: http://localhost:5000")
+    print("=" * 70 + "\n")
     
     # Start Flask app
     app.run(debug=True, host='0.0.0.0', port=5000)
