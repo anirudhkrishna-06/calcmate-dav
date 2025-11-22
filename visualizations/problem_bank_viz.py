@@ -185,40 +185,8 @@ class ProblemBankVisualizer:
         
         return filename.replace('static/', '')
     
-    def create_source_attempts_barchart(self):
-        """Visualization 4: Problem Source vs Average Attempts"""
-        plt.figure(figsize=(10, 6))
-        
-        # Calculate average attempts by source
-        source_attempts = self.df.groupby('source')['avg_attempts_to_solve'].mean().sort_values(ascending=False)
-        
-        colors_map = {'NCERT': '#4ECDC4', 'User-Generated': '#FF6B6B', 'Synthetic': '#45B7D1'}
-        bar_colors = [colors_map.get(source, '#888888') for source in source_attempts.index]
-        
-        bars = plt.bar(source_attempts.index, source_attempts.values, 
-                      color=bar_colors, edgecolor='black', linewidth=1.2)
-        
-        # Add value labels on bars
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{height:.2f}', ha='center', va='bottom', fontweight='bold', fontsize=11)
-        
-        plt.xlabel('Problem Source', fontsize=12, fontweight='bold')
-        plt.ylabel('Average Attempts to Solve', fontsize=12, fontweight='bold')
-        plt.title('Problem Source Comparison: Which Source Is Harder?', 
-                 fontsize=14, fontweight='bold', pad=20)
-        plt.grid(True, alpha=0.3, axis='y', linestyle='--')
-        
-        plt.tight_layout()
-        filename = f"{self.output_dir}/source_attempts_bar.png"
-        plt.savefig(filename, dpi=300, bbox_inches='tight', facecolor='white')
-        plt.close()
-        
-        return filename.replace('static/', '')
-    
     def create_success_rate_histogram(self):
-        """Visualization 5: Success Rate Distribution"""
+        """Visualization 4: Success Rate Distribution"""
         plt.figure(figsize=(12, 6))
         
         # Create histogram
@@ -262,9 +230,9 @@ class ProblemBankVisualizer:
         return filename.replace('static/', '')
     
     def create_additional_visualizations(self):
-        """Create 3 additional supporting visualizations"""
+        """Create 2 additional supporting visualizations"""
         
-        # Viz 6: Grade Level Distribution
+        # Viz 5: Grade Level Distribution
         plt.figure(figsize=(10, 6))
         grade_counts = self.df['grade_level'].value_counts().sort_index()
         bars = plt.bar(grade_counts.index, grade_counts.values, 
@@ -285,30 +253,7 @@ class ProblemBankVisualizer:
         plt.savefig(filename_grade, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         
-        # Viz 7: Verification Status Impact
-        plt.figure(figsize=(10, 6))
-        verified_success = self.df.groupby('verified_by_human')['success_rate'].mean() * 100
-        colors_verify = {0: '#FF6B6B', 1: '#4ECDC4'}
-        bars = plt.bar(['Not Verified', 'Verified'], verified_success.values,
-                      color=[colors_verify.get(i, '#888888') for i in verified_success.index],
-                      edgecolor='black', linewidth=1.2)
-        
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(bar.get_x() + bar.get_width()/2., height,
-                    f'{height:.1f}%', ha='center', va='bottom', fontweight='bold', fontsize=12)
-        
-        plt.ylabel('Average Success Rate (%)', fontsize=12, fontweight='bold')
-        plt.title('Impact of Human Verification on Success Rate', fontsize=14, fontweight='bold', pad=20)
-        plt.ylim(0, 100)
-        plt.grid(True, alpha=0.3, axis='y', linestyle='--')
-        plt.tight_layout()
-        
-        filename_verify = f"{self.output_dir}/verification_impact.png"
-        plt.savefig(filename_verify, dpi=300, bbox_inches='tight', facecolor='white')
-        plt.close()
-        
-        # Viz 8: Complexity Distribution
+        # Viz 6: Complexity Distribution
         plt.figure(figsize=(10, 6))
         complexity_counts = self.df['equation_complexity_score'].value_counts().sort_index()
         bars = plt.bar(complexity_counts.index, complexity_counts.values,
@@ -330,8 +275,7 @@ class ProblemBankVisualizer:
         plt.savefig(filename_complex, dpi=300, bbox_inches='tight', facecolor='white')
         plt.close()
         
-        return (filename_grade.replace('static/', ''), 
-                filename_verify.replace('static/', ''),
+        return (filename_grade.replace('static/', ''),
                 filename_complex.replace('static/', ''))
     
     def perform_anova_test(self):
@@ -571,15 +515,13 @@ class ProblemBankVisualizer:
             'complexity_success': self.create_complexity_vs_success_scatter(),
             'difficulty_time': self.create_difficulty_time_boxplot(),
             'topic_success': self.create_topic_success_stacked_bar(),
-            'source_attempts': self.create_source_attempts_barchart(),
             'success_histogram': self.create_success_rate_histogram()
         }
         
         # Additional visualizations
         print("🎨 Creating additional visualizations...")
-        grade_plot, verify_plot, complex_plot = self.create_additional_visualizations()
+        grade_plot, complex_plot = self.create_additional_visualizations()
         visuals['grade_distribution'] = grade_plot
-        visuals['verification_impact'] = verify_plot
         visuals['complexity_distribution'] = complex_plot
         
         # Perform statistical analyses
