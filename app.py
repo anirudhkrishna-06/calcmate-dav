@@ -122,7 +122,7 @@ def interactions_dashboard():
             return "Error running interactions analysis", 500
     
     return render_template(
-        'user_interactions.html',
+        'interactions.html',
         overview=interactions_results['overview'],
         eda=interactions_results['eda'],
         visuals=interactions_results['visuals'],
@@ -131,30 +131,29 @@ def interactions_dashboard():
 
 @app.route('/interactions/regression')
 def interactions_regression():
-    """Detailed predictive modeling page for interactions"""
+    """Detailed regression analysis page for user interactions"""
     if not interactions_results:
         success = run_interactions_analysis()
         if not success:
             return "Error running interactions analysis", 500
     
     return render_template(
-        'user_interactions_regression.html',
+        'interactions_regression.html',
         overview=interactions_results['overview'],
         regression=interactions_results['regression'],
-        confusion_matrix=interactions_results['visuals']['confusion_matrix'],
-        feature_importance=interactions_results['visuals']['feature_importance']
+        regression_plot=interactions_results['visuals']['regression_plot']
     )
 
 @app.route('/interactions/hypothesis')
 def interactions_hypothesis():
-    """Detailed hypothesis testing page for interactions"""
+    """Detailed hypothesis testing page for user interactions"""
     if not interactions_results:
         success = run_interactions_analysis()
         if not success:
             return "Error running interactions analysis", 500
     
     return render_template(
-        'user_interactions_hypothesis.html',
+        'interactions_hypothesis.html',
         overview=interactions_results['overview'],
         hypothesis=interactions_results['hypothesis'],
         hypothesis_plot=interactions_results['visuals']['hypothesis_plot']
@@ -246,7 +245,7 @@ def get_pipeline_stats():
 
 @app.route('/api/interactions/stats')
 def get_interactions_stats():
-    """API endpoint to get interactions statistics"""
+    """API endpoint to get user interactions statistics"""
     if not interactions_results:
         return jsonify({"status": "error", "message": "No interactions data"}), 404
     return jsonify({"status": "success", "data": interactions_results['overview']})
