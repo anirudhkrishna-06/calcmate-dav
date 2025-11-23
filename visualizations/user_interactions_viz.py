@@ -296,64 +296,262 @@ class UserInteractionsVisualizer:
         return filename.replace('static/', '')
     
     def perform_regression_analysis(self):
-        """Perform Multiple Linear Regression: Study Hours + Previous Score → Accuracy"""
-        from sklearn.linear_model import LinearRegression
-        from sklearn.metrics import r2_score, mean_squared_error
-        
-        # Prepare data
-        features = ['study_hours_per_week', 'previous_math_score']
-        X = self.df[features].dropna()
-        y = self.df.loc[X.index, 'user_accuracy']
-        
-        # Perform regression
-        model = LinearRegression()
-        model.fit(X, y)
-        y_pred = model.predict(X)
-        
-        # Create visualization
-        fig, axes = plt.subplots(1, 2, figsize=(14, 6))
-        
-        # Plot 1: Actual vs Predicted
-        axes[0].scatter(y, y_pred, alpha=0.6, color='blue', s=50, edgecolors='black', linewidth=0.5)
-        axes[0].plot([y.min(), y.max()], [y.min(), y.max()], 'r--', linewidth=2, label='Perfect Prediction')
-        axes[0].set_xlabel('Actual Accuracy')
-        axes[0].set_ylabel('Predicted Accuracy')
-        axes[0].set_title(f'Actual vs Predicted Accuracy\nR² = {r2_score(y, y_pred):.3f}')
-        axes[0].legend()
-        axes[0].grid(True, alpha=0.3)
-        
-        # Plot 2: Feature Coefficients
-        coefficients = pd.DataFrame({
-            'Feature': features,
-            'Coefficient': model.coef_
-        }).sort_values('Coefficient', ascending=True)
-        
-        colors_coef = ['red' if x < 0 else 'green' for x in coefficients['Coefficient']]
-        axes[1].barh(coefficients['Feature'], coefficients['Coefficient'], color=colors_coef)
-        axes[1].set_xlabel('Coefficient Value')
-        axes[1].set_title('Feature Importance in Predicting Accuracy')
-        axes[1].axvline(x=0, color='black', linestyle='--', linewidth=1)
-        axes[1].grid(True, alpha=0.3, axis='x')
-        
+        """
+        Ultra-Minimal Logistic Regression Model
+        Single-Chart Version (Feature Coefficients Only)
+        """
+
+        import pandas as pd
+        import numpy as np
+        import matplotlib.pyplot as plt
+        from sklearn.model_selection import train_test_split, cross_val_score
+        from sklearn.linear_model import LogisticRegression
+        from sklearn.preprocessing import StandardScaler
+        from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, log_loss
+        from sklearn.ensemble import RandomForestClassifier
+
+        df = self.df.copy()
+
+        # ==============================
+        # Data Cleaning
+        # ==============================
+
+        df = df.dropna(subset=['user_accuracy'])
+        df = df[df['user_accuracy'].isin([0, 1])]
+
+        # Binary encode hint_used
+        df['hint_used_binary'] = df['hint_used'].map({'yes': 1, 'no': 0})
+
+        # Enforce required columns
+        required_cols = ['difficulty_level', 'hint_used_binary']
+        missing = [col for col in required_cols if col not in df.columns]
+        if missing:
+            raise ValueError(f"❌ Missing required columns: {missing}")
+
+        # ==============================
+        # Feature set
+        # ==============================
+
+        feature_cols = ['difficulty_level', 'hint_used_binary']
+        X = df[feature_cols].fillna(0)
+        y = df['user_accuracy']
+
+        # ==============================
+        # Class Distribution
+        # ==============================
+
+        class_distribution = y.value_counts()
+        class_ratio = (
+            class_distribution[1] / class_distribution[0]
+            if 0 in class_distribution.index else 1.0
+        )
+
+        # ==============================
+        # Train/Test Split
+        # ==============================
+
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.25, random_state=42, stratify=y
+        )
+
+        # ==============================
+        # Feature Scaling
+        # ==============================
+
+        scaler = StandardScaler()
+        X_train_scaled = scaler.fit_transform(X_train)
+        X_test_scaled = scaler.transform(X_test)
+
+        # ==============================
+        # Hyperparameter Tuning
+        # ==============================
+
+        best_c = 1.0
+        best_cv_score = 0
+
+        for c_val in [0.01, 0.1, 1.0, 10.0, 100.0]:
+            temp_model = LogisticRegression(
+                C=c_val,
+                max_iter=2000,
+                class_weight='balanced',
+                random_state=42
+            )
+            cv_scores = cross_val_score(
+                temp_model, X_train_scaled, y_train, cv=5, scoring='roc_auc'
+            )
+            mean_score = cv_scores.mean()
+
+            if mean_score > best_cv_score:
+                best_cv_score = mean_score
+                best_c = c_val
+
+        # ==============================
+        # Train Final Model
+        # ==============================
+
+        model = LogisticRegression(
+            C=best_c,
+            max_iter=2000,
+            class_weight='balanced',
+            random_state=42
+        )
+        model.fit(X_train_scaled, y_train)
+
+        # ==============================
+        # Predictions
+        # ==============================
+
+        y_pred = model.predict(X_test_scaled)
+        y_prob = model.predict_proba(X_test_scaled)[:, 1]
+
+        # ==============================
+        # Evaluation
+        # ==============================
+
+        accuracy = accuracy_score(y_test, y_pred)
+        roc_auc = roc_auc_score(y_test, y_prob)
+        log_loss_val = log_loss(y_test, y_prob)
+        report = classification_report(y_test, y_pred, output_dict=True)
+
+        precision = report.get('1', {}).get('precision', 0.0)
+        recall = report.get('1', {}).get('recall', 0.0)
+        f1_score = report.get('1', {}).get('f1-score', 0.0)
+
+        # ==============================
+        # Coefficient Analysis
+        # ==============================
+
+        coefficients_data = []
+        for feature, coef in zip(feature_cols, model.coef_[0]):
+            direction = "Positive" if coef > 0 else "Negative"
+            abs_val = abs(coef)
+
+            if abs_val > 0.3:
+                impact = "Strong"
+            elif abs_val > 0.15:
+                impact = "Moderate"
+            elif abs_val > 0.05:
+                impact = "Weak"
+            else:
+                impact = "Negligible"
+
+            coefficients_data.append({
+                'feature': feature,
+                'coefficient': float(coef),
+                'odds_ratio': float(np.exp(coef)),
+                'direction': direction,
+                'impact': impact
+            })
+
+        # ==============================
+        # ✅ SINGLE PERFECT CHART
+        # ==============================
+
+        plt.figure(figsize=(8, 4))
+
+        coef_vals = [c['coefficient'] for c in coefficients_data]
+        feat_names = [c['feature'] for c in coefficients_data]
+        colors = ['green' if c > 0 else 'red' for c in coef_vals]
+
+        plt.barh(feat_names, coef_vals, color=colors)
+        plt.axvline(0, linestyle='--')
+        plt.title("Logistic Regression – Feature Impact")
+        plt.xlabel("Effect on Log-Odds")
+        plt.ylabel("Features")
+
         plt.tight_layout()
-        filename = f"{self.output_dir}/interaction_regression_analysis.png"
-        plt.savefig(filename, dpi=300, bbox_inches='tight')
+
+        plot_filename = f"{self.output_dir}/logistic_feature_impact.png"
+        plt.savefig(plot_filename, dpi=300, bbox_inches='tight')
         plt.close()
-        
-        # Regression results
-        regression_results = {
-            'r_squared': round(r2_score(y, y_pred), 4),
-            'rmse': round(np.sqrt(mean_squared_error(y, y_pred)), 4),
-            'coefficients': {
-                'study_hours_per_week': round(model.coef_[0], 4),
-                'previous_math_score': round(model.coef_[1], 4)
-            },
-            'intercept': round(model.intercept_, 4),
-            'equation': f"Accuracy = {model.intercept_:.4f} + {model.coef_[0]:.4f}*StudyHours + {model.coef_[1]:.4f}*PreviousScore",
-            'interpretation': f"Study hours contributes {model.coef_[0]:.4f} and previous score contributes {model.coef_[1]:.4f} to accuracy prediction"
+
+        # ==============================
+        # Warnings
+        # ==============================
+
+        warnings = []
+        if roc_auc < 0.7:
+            warnings.append("⚠️ ROC-AUC < 0.7: Moderate discriminative power")
+
+        if accuracy < 0.65:
+            warnings.append("⚠️ Accuracy < 65%")
+
+        # ==============================
+        # Top Predictors
+        # ==============================
+
+        pos = sorted(
+            [c for c in coefficients_data if c['coefficient'] > 0],
+            key=lambda x: -x['coefficient']
+        )
+        neg = sorted(
+            [c for c in coefficients_data if c['coefficient'] < 0],
+            key=lambda x: x['coefficient']
+        )
+
+        # ==============================
+        # Results Package
+        # ==============================
+
+        results = {
+            'model_type': 'ultra_minimal_logistic_regression',
+            'accuracy': round(accuracy, 4),
+            'precision': round(precision, 4),
+            'recall': round(recall, 4),
+            'f1_score': round(f1_score, 4),
+            'roc_auc': round(roc_auc, 4),
+            'log_loss': round(log_loss_val, 4),
+            'cv_score': round(best_cv_score, 4),
+            'best_regularization': best_c,
+            'n_features': len(feature_cols),
+            'feature_names': feature_cols,
+            'coefficients': coefficients_data,
+            'class_distribution': class_distribution.to_dict(),
+            'class_ratio': round(class_ratio, 4),
+            'warnings': warnings,
+            'model_equation': (
+                f"Log-odds = {model.intercept_[0]:.3f} + " +
+                " + ".join([f"({coef:.3f} × {feat})"
+                            for feat, coef in zip(feature_cols, model.coef_[0])])
+            ),
+            'interpretation': {
+                'model_quality': 'Good' if roc_auc > 0.75 else 'Moderate' if roc_auc > 0.65 else 'Weak',
+                'top_positive_predictor': pos[0]['feature'] if pos else 'None',
+                'top_negative_predictor': neg[0]['feature'] if neg else 'None'
+            }
         }
+
+        return results, plot_filename.replace('static/', '')
+
+
+    def debug_data_issues(self):
+        """Debug function to identify data issues"""
+        print("\n🔍 DEBUGGING DATA ISSUES:")
         
-        return regression_results, filename.replace('static/', '')
+        # Check if dataframe is loaded
+        if self.df is None:
+            print("❌ DataFrame is None - data not loaded properly")
+            return
+        
+        print(f"✅ DataFrame loaded with {len(self.df)} rows")
+        
+        # Check key columns for regression
+        regression_cols = ['user_accuracy', 'study_hours_per_week', 'previous_math_score', 
+                        'attempt_number', 'response_time_seconds', 'difficulty_level', 'hint_used']
+        
+        for col in regression_cols:
+            if col in self.df.columns:
+                non_null = self.df[col].notna().sum()
+                print(f"   {col}: {non_null}/{len(self.df)} non-null values")
+                
+                if col in ['study_hours_per_week', 'previous_math_score', 'response_time_seconds']:
+                    print(f"      Range: {self.df[col].min():.2f} to {self.df[col].max():.2f}")
+            else:
+                print(f"❌ {col}: Column missing!")
+        
+        # Check for hint_used values
+        if 'hint_used' in self.df.columns:
+            print(f"   hint_used distribution: {self.df['hint_used'].value_counts().to_dict()}")
     
     def perform_hypothesis_test(self):
         """Perform T-Test: Does Hint Usage Significantly Affect User Accuracy?"""
@@ -534,3 +732,4 @@ if __name__ == "__main__":
         print(f"📈 EDA Summary: {results['overview']}")
     else:
         print("❌ Analysis failed!")
+
