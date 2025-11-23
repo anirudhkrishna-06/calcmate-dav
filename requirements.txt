@@ -1,0 +1,16 @@
+Flask>=2.0
+pandas>=1.3
+numpy>=1.21
+matplotlib>=3.4
+seaborn>=0.11
+scipy>=1.7
+scikit-learn>=1.0
+plotly>=5.0
+wordcloud>=1.8.1
+datasets>=2.0
+pillow>=8.0
+
+# Optional / transitive (usually installed alongside above packages)
+# - jinja2 (provided by Flask)
+# - python-dateutil, pytz (installed by pandas)
+# - joblib, threadpoolctl (installed by scikit-learn)
