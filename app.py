@@ -207,6 +207,45 @@ def problem_bank_hypothesis():
         hypothesis_plot=problem_bank_results['visuals']['hypothesis_plot']
     )
 
+# ==================== DEBUG AND UTILITY ROUTES ====================
+
+@app.route('/debug_data')
+def debug_data():
+    """Debug route to check data issues"""
+    visualizer = UserInteractionsVisualizer('static/datasets/user_interactions.csv')
+    if visualizer.load_data():
+        visualizer.debug_data_issues()
+        return "Check console for data debug info"
+    else:
+        return "Failed to load data for debugging"
+
+@app.route('/debug_regression')
+def debug_regression():
+    """Debug route to test regression directly"""
+    try:
+        visualizer = UserInteractionsVisualizer('static/datasets/user_interactions.csv')
+        
+        if not visualizer.load_data():
+            return "Failed to load data"
+        
+        # Run regression analysis
+        regression_results, regression_plot = visualizer.perform_regression_analysis()
+        
+        return f"""
+        <h1>Regression Debug Results</h1>
+        <pre>
+        R-squared: {regression_results['r_squared']}
+        RMSE: {regression_results['rmse']}
+        MAE: {regression_results['mae']}
+        Samples: {regression_results['n_samples']}
+        Features: {regression_results['n_features']}
+        Equation: {regression_results['model_equation']}
+        Coefficients: {regression_results['coefficients']}
+        </pre>
+        """
+    except Exception as e:
+        return f"Regression debug failed: {str(e)}"
+
 # ==================== API ENDPOINTS ====================
 
 @app.route('/api/refresh-all')
