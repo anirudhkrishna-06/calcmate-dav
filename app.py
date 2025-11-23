@@ -139,7 +139,6 @@ def interactions_regression():
     
     return render_template(
         'interactions_regression.html',
-        overview=interactions_results['overview'],
         regression=interactions_results['regression'],
         regression_plot=interactions_results['visuals']['regression_plot']
     )
