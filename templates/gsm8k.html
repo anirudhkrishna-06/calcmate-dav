@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GSM8K Dataset Analytics</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Forum&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+
+        body {
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0E0E0F;
+            color: #FFFFFF;
+            min-height: 100vh;
+        }
+
+        .nav {
+            background: #1A1B1F;
+            border-bottom: 1px solid rgba(0, 201, 242, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-brand {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #BFC4C9;
+            text-decoration: none;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-link:hover { color: #00C9F2; }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .header {
+            padding: 80px 0 60px;
+            border-bottom: 1px solid rgba(191, 196, 201, 0.05);
+        }
+
+        .header-title {
+            font-size: 42px;
+            font-weight: 300;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #FFFFFF;
+            margin-bottom: 16px;
+        }
+
+        .header-subtitle {
+            font-size: 13px;
+            font-weight: 300;
+            color: #BFC4C9;
+            letter-spacing: 1px;
+        }
+
+        .section {
+            padding: 60px 0;
+            border-bottom: 1px solid rgba(191, 196, 201, 0.05);
+        }
+
+        .section-header {
+            margin-bottom: 40px;
+        }
+
+        .section-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #00C9F2;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            color: #FFFFFF;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: rgba(191, 196, 201, 0.1);
+            border: 1px solid rgba(191, 196, 201, 0.1);
+        }
+
+        .stat-card {
+            background: #1A1B1F;
+            padding: 32px 24px;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .stat-card:hover {
+            background: rgba(0, 201, 242, 0.02);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #BFC4C9;
+            margin-bottom: 12px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 300;
+            color: #FFFFFF;
+            letter-spacing: -1px;
+        }
+
+        .stat-unit {
+            font-size: 12px;
+            font-weight: 400;
+            color: #BFC4C9;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .visual-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .visual-card {
+            background: #1A1B1F;
+            border: 1px solid rgba(191, 196, 201, 0.1);
+            border-radius: 6px;
+            padding: 24px;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .visual-card:hover {
+            border-color: rgba(0, 201, 242, 0.3);
+        }
+
+        .visual-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: #FFFFFF;
+            margin-bottom: 8px;
+        }
+
+        .visual-card-description {
+            font-size: 12px;
+            font-weight: 300;
+            color: #BFC4C9;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .visual-card img {
+            width: 100%;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .visual-card img:hover {
+            opacity: 0.9;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: #1A1B1F;
+            border: 1px solid rgba(191, 196, 201, 0.1);
+            margin-top: 24px;
+        }
+
+        .comparison-table th {
+            background: rgba(0, 201, 242, 0.05);
+            padding: 16px 20px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #00C9F2;
+            border-bottom: 1px solid rgba(191, 196, 201, 0.1);
+        }
+
+        .comparison-table td {
+            padding: 16px 20px;
+            font-size: 13px;
+            font-weight: 400;
+            color: #BFC4C9;
+            border-bottom: 1px solid rgba(191, 196, 201, 0.05);
+        }
+
+        .comparison-table tr:hover {
+            background: rgba(0, 201, 242, 0.02);
+        }
+
+        .sample-section {
+            background: #1A1B1F;
+            border: 1px solid rgba(191, 196, 201, 0.1);
+            border-radius: 6px;
+            padding: 40px;
+            margin-top: 24px;
+        }
+
+        .question-card {
+            background: rgba(0, 201, 242, 0.02);
+            border: 1px solid rgba(191, 196, 201, 0.1);
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 16px;
+        }
+
+        .question-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .question-label {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: #00C9F2;
+            margin-bottom: 12px;
+        }
+
+        .question-text {
+            font-size: 13px;
+            font-weight: 400;
+            color: #FFFFFF;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .answer-text {
+            font-size: 12px;
+            font-weight: 300;
+            color: #BFC4C9;
+            line-height: 1.7;
+        }
+
+        #imageModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(14, 14, 15, 0.95);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #1A1B1F;
+            border: 1px solid rgba(191, 196, 201, 0.2);
+            border-radius: 6px;
+            padding: 40px;
+            max-width: 90%;
+            max-height: 90%;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            color: #BFC4C9;
+            cursor: pointer;
+            transition: color 150ms;
+        }
+
+        .modal-close:hover {
+            color: #00C9F2;
+        }
+
+        #modalImage {
+            max-width: 100%;
+            max-height: 80vh;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .visual-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 0 20px; }
+            .nav { padding: 16px 20px; flex-direction: column; gap: 16px; }
+            .nav-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+            .header { padding: 60px 0 40px; }
+            .header-title { font-size: 28px; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="nav-brand">GSM8K ANALYTICS</div>
+        <div class="nav-links">
+            <a href="/" class="nav-link">HOME</a>
+            <a href="/pipeline" class="nav-link">PIPELINE</a>
+            <a href="/interactions" class="nav-link">INTERACTIONS</a>
+            <a href="/problem_bank" class="nav-link">PROBLEM BANK</a>
+        </div>
+    </nav>
+
+    <div class="container">
+    
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">OVERVIEW</div>
+                <h2 class="section-title">Dataset Metrics</h2>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Problems</div>
+                    <div class="stat-value">{{ summary.total_problems }}</div>
+                    <div class="stat-unit">Problems</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Training Set</div>
+                    <div class="stat-value">{{ summary.train_problems }}</div>
+                    <div class="stat-unit">Problems</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Validation Set</div>
+                    <div class="stat-value">{{ summary.validation_problems }}</div>
+                    <div class="stat-unit">Problems</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Question Length</div>
+                    <div class="stat-value">{{ summary.avg_question_length }}</div>
+                    <div class="stat-unit">Avg Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Answer Length</div>
+                    <div class="stat-value">{{ summary.avg_answer_length }}</div>
+                    <div class="stat-unit">Avg Words</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Reasoning Steps</div>
+                    <div class="stat-value">{{ summary.avg_reasoning_steps }}</div>
+                    <div class="stat-unit">Avg per Problem</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Primary Operation</div>
+                    <div class="stat-value" style="font-size: 20px;">{{ summary.most_common_operation.title() }}</div>
+                    <div class="stat-unit">Most Frequent</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Integer Answers</div>
+                    <div class="stat-value">{{ summary.integer_answers_ratio }}</div>
+                    <div class="stat-unit">Percentage</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">TEXT ANALYSIS</div>
+                <h2 class="section-title">Length Distribution</h2>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-card-title">Question & Answer Length Distribution</div>
+                    <div class="visual-card-description">Distribution of word counts across dataset</div>
+                    <img src="{{ url_for('static', filename=visuals.text_lengths_histogram) }}" onclick="openModal(this.src)">
+                </div>
+                <div class="visual-card">
+                    <div class="visual-card-title">Question vs Answer Correlation</div>
+                    <div class="visual-card-description">Relationship between question and answer complexity</div>
+                    <img src="{{ url_for('static', filename=visuals.question_answer_scatter) }}" onclick="openModal(this.src)">
+                </div>
+                <div class="visual-card">
+                    <div class="visual-card-title">Train vs Validation Comparison</div>
+                    <div class="visual-card-description">Length comparison across data splits</div>
+                    <img src="{{ url_for('static', filename=visuals.train_val_comparison) }}" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </section>
+
+        
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">OPERATIONS</div>
+                <h2 class="section-title">Arithmetic Analysis</h2>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-card-title">Operation Frequency</div>
+                    <div class="visual-card-description">Distribution of arithmetic operations</div>
+                    <img src="{{ url_for('static', filename=visuals.operations_pie) }}" onclick="openModal(this.src)">
+                </div>
+                <div class="visual-card">
+                    <div class="visual-card-title">Multi-Operation Problems</div>
+                    <div class="visual-card-description">Problems requiring multiple operation types</div>
+                    <img src="{{ url_for('static', filename=visuals.multi_operations) }}" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">CONTENT</div>
+                <h2 class="section-title">Topic Analysis</h2>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-card-title">Topic Distribution</div>
+                    <div class="visual-card-description">Keyword-based topic inference</div>
+                    <img src="{{ url_for('static', filename=visuals.topic_distribution) }}" onclick="openModal(this.src)">
+                </div>
+                <div class="visual-card">
+                    <div class="visual-card-title">Word Cloud</div>
+                    <div class="visual-card-description">Frequency analysis of key terms</div>
+                    <img src="{{ url_for('static', filename=visuals.wordcloud) }}" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">ANSWERS</div>
+                <h2 class="section-title">Final Answer Analysis</h2>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-card-title">Answer Distribution</div>
+                    <div class="visual-card-description">Numeric answer values and type breakdown</div>
+                    <img src="{{ url_for('static', filename=visuals.answer_analysis) }}" onclick="openModal(this.src)">
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <div class="section-header">
+                <div class="section-label">COMPARISON</div>
+                <h2 class="section-title">Train vs Validation</h2>
+            </div>
+
+            <div class="visual-grid">
+                <div class="visual-card">
+                    <div class="visual-card-title">Detailed Comparison</div>
+                    <div class="visual-card-description">Comprehensive metric comparison across splits</div>
+                    <img src="{{ url_for('static', filename=visuals.train_val_detailed_comparison) }}" onclick="openModal(this.src)">
+                </div>
+            </div>
+
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Training</th>
+                        <th>Validation</th>
+                        <th>Difference</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for i in range(comparison_data.Metric|length) %}
+                    <tr>
+                        <td>{{ comparison_data.Metric[i] }}</td>
+                        <td>{{ "%.2f"|format(comparison_data.Train[i]) }}{% if not ('Length' in comparison_data.Metric[i] or 'Steps' in comparison_data.Metric[i]) %}%{% endif %}</td>
+                        <td>{{ "%.2f"|format(comparison_data.Validation[i]) }}{% if not ('Length' in comparison_data.Metric[i] or 'Steps' in comparison_data.Metric[i]) %}%{% endif %}</td>
+                        <td>{{ "%.2f"|format((comparison_data.Train[i] - comparison_data.Validation[i])|abs) }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </section>
+
+        <section class="section" style="border-bottom: none; padding-bottom: 80px;">
+            <div class="section-header">
+                <div class="section-label">SAMPLES</div>
+                <h2 class="section-title">Problem Examples</h2>
+            </div>
+
+            <div class="sample-section">
+                {% for sample in sample_questions %}
+                <div class="question-card">
+                    <div class="question-label">{{ sample.split|upper }}</div>
+                    <div class="question-text">{{ sample.question }}</div>
+                    <div class="question-label">SOLUTION</div>
+                    <div class="answer-text">{{ sample.answer|replace('\n','<br>')|safe }}</div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </div>
+
+    <div id="imageModal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeModal()">&times;</span>
+            <img id="modalImage">
+        </div>
+    </div>
+
+    <script>
+        function openModal(src) {
+            document.getElementById('modalImage').src = src;
+            document.getElementById('imageModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+
+        window.onclick = e => {
+            if (e.target.id === 'imageModal') closeModal();
+        };
+    </script>
+</body>
+</html>

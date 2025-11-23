@@ -257,6 +257,58 @@ def get_problem_bank_stats():
         return jsonify({"status": "error", "message": "No problem bank data"}), 404
     return jsonify({"status": "success", "data": problem_bank_results['overview']})
 
+# Add to imports at the top
+from visualizations.gsm8k_viz import GSM8KVisualizer
+
+# Add global variable
+gsm8k_results = {}
+
+def run_gsm8k_analysis():
+    """Run GSM8K analysis and cache results"""
+    global gsm8k_results
+    
+    try:
+        visualizer = GSM8KVisualizer()
+        results = visualizer.run_complete_analysis()
+        
+        if results:
+            gsm8k_results = results
+            return True
+        else:
+            return False
+    except Exception as e:
+        print(f"Error in GSM8K analysis: {e}")
+        return False
+
+# Add new routes
+@app.route('/gsm8k')
+def gsm8k_dashboard():
+    """GSM8K dataset analytics dashboard"""
+    if not gsm8k_results:
+        success = run_gsm8k_analysis()
+        if not success:
+            return "Error running GSM8K analysis", 500
+    
+    return render_template(
+        'gsm8k.html',
+        summary=gsm8k_results['summary'],
+        visuals=gsm8k_results['visuals'],
+        comparison_data=gsm8k_results['comparison_data'],
+        sample_questions=gsm8k_results['sample_questions']
+    )
+
+@app.route('/api/gsm8k/refresh')
+def refresh_gsm8k():
+    """API endpoint to refresh GSM8K analysis"""
+    global gsm8k_results
+    gsm8k_results = {}
+    
+    success = run_gsm8k_analysis()
+    if success:
+        return jsonify({"status": "success", "message": "GSM8K analysis refreshed"})
+    else:
+        return jsonify({"status": "error", "message": "GSM8K analysis failed"}), 500
+
 if __name__ == '__main__':
     # Run initial analyses when app starts
     print("🚀 Starting Flask application...")
@@ -279,6 +331,13 @@ if __name__ == '__main__':
         print("✅ Problem Bank analysis completed successfully!")
     else:
         print("❌ Problem Bank analysis failed!")
+    
+    # ADD THIS - Run GSM8K at startup
+    print("\n🧮 Dataset 4: Running GSM8K analysis...")
+    if run_gsm8k_analysis():
+        print("✅ GSM8K analysis completed successfully!")
+    else:
+        print("❌ GSM8K analysis failed!")
     
     print("\n" + "=" * 70)
     print("🌐 Starting Flask server...")
