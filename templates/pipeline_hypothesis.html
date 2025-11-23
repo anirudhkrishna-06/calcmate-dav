@@ -817,27 +817,7 @@
         </div>
 
         <!-- Statistical Interpretation -->
-        <div class="glass-card fade-in">
-            <div class="interpretation-section">
-                <h3>Statistical Interpretation</h3>
-                <div class="interpretation-content">
-                    <div class="interpretation-point">
-                        <h4>P-Value Meaning</h4>
-                        <p>A p-value of {{ hypothesis.p_value }} indicates the probability of observing these results if the null hypothesis were true. {% if hypothesis.p_value < 0.05 %}This is below our 0.05 threshold, suggesting the results are statistically significant.{% else %}This is above our 0.05 threshold, so we cannot reject the null hypothesis.{% endif %}</p>
-                    </div>
-                    
-                    <div class="interpretation-point">
-                        <h4>F-Statistic Context</h4>
-                        <p>An F-statistic of {{ hypothesis.f_statistic }} measures the ratio of variance between groups to variance within groups. Higher values indicate greater differences between difficulty levels.</p>
-                    </div>
-                    
-                    <div class="interpretation-point">
-                        <h4>ANOVA Methodology</h4>
-                        <p>We used One-Way ANOVA to compare means across multiple difficulty levels. This test is ideal for categorical independent variables with continuous dependent variables.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        
     <!-- Modal for image zoom -->
     <div id="imageModal">
         <div class="modal-content">

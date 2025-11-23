@@ -16,7 +16,7 @@
         .glass-card:nth-child(3) { animation-delay: 300ms; }
         .glass-card:nth-child(4) { animation-delay: 400ms; }
         .header { text-align: center; padding: 48px 40px 32px; background: linear-gradient(180deg, #1A1B1F 0%, #0E0E0F 100%); border-bottom: 1px solid rgba(191, 196, 201, 0.15); }
-        .header h1 { font-size: 32px; font-weight: 600; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; background: linear-gradient(90deg, #FFFFFF 0%, #00C9F2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header h1 { font-size: 32px; font-weight: 600; margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; background: linear-gradient(90deg, #FFFFFF 0%, #00C9F2 100%); background-clip: text; -webkit-text-fill-color: transparent; }
         .header p { color: #BFC4C9; font-size: 14px; font-weight: 300; letter-spacing: 0.5px; }
         .nav-buttons { display: flex; gap: 2px; justify-content: center; margin: 32px 0 0; padding-top: 24px; border-top: 1px solid rgba(191, 196, 201, 0.1); flex-wrap: wrap; }
         .nav-btn { padding: 12px 28px; background: transparent; color: #BFC4C9; border: 1px solid rgba(191, 196, 201, 0.2); cursor: pointer; text-decoration: none; font-size: 13px; letter-spacing: 0.8px; text-transform: uppercase; transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); }
@@ -140,23 +140,7 @@
             </div>
         </div>
 
-        <div class="glass-card">
-            <h2 class="section-title">Actionable Recommendations</h2>
-            <div class="insights-grid">
-                <div class="insight-card">
-                    <h4>Time Allocation</h4>
-                    <p>Use this model to estimate time requirements for problem sets and tests.</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Difficulty Balancing</h4>
-                    <p>Mix easy and hard problems to maintain reasonable solving times.</p>
-                </div>
-                <div class="insight-card">
-                    <h4>Problem Design</h4>
-                    <p>Consider simplifying equation complexity when creating challenging problems to avoid excessive time requirements.</p>
-                </div>
-            </div>
-        </div>
+        
     </div>
 
     <div id="imageModal">

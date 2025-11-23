@@ -362,8 +362,7 @@
             
             <div class="nav-buttons">
                 <a href="/" class="nav-btn">Home</a>
-                <a href="/problem_bank/regression" class="nav-btn">Regression Analysis</a>
-                <a href="/problem_bank/hypothesis" class="nav-btn">Hypothesis Testing</a>
+                
             </div>
         </div>
 
@@ -446,42 +445,20 @@
 
 
                 <!-- Visualization 4: Success Distribution -->
-                <div class="visual-card">
-                    <h3>Overall Difficulty Distribution</h3>
-                    <img src="{{ url_for('static', filename=visuals.success_histogram) }}" 
-                         alt="Success Histogram"
-                         onclick="openModal(this.src)">
-                    <p>Shows spread of problem difficulty levels</p>
-                </div>
+                
 
                 <!-- Visualization 5: Grade Distribution -->
-                <div class="visual-card">
-                    <h3>Grade Level Distribution</h3>
-                    <img src="{{ url_for('static', filename=visuals.grade_distribution) }}" 
-                         alt="Grade Distribution"
-                         onclick="openModal(this.src)">
-                    <p>Number of problems per grade level</p>
-                </div>
+                
 
 
                 <!-- Visualization 6: Complexity Distribution -->
-                <div class="visual-card">
-                    <h3>Complexity Distribution</h3>
-                    <img src="{{ url_for('static', filename=visuals.complexity_distribution) }}" 
-                         alt="Complexity Distribution"
-                         onclick="openModal(this.src)">
-                    <p>Distribution of equation complexity scores</p>
-                </div>
+            
+                
             </div>
         </div>
 
         <!-- Quick Insights -->
-        <div class="section">
-            <h2>Quick Insights</h2>
-            <div id="insights">
-                {{ insights|safe }}
-            </div>
-        </div>
+        
     </div>
 
     <!-- Modal for image zoom -->

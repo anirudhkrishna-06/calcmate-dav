@@ -442,13 +442,7 @@
                 </div>
 
                 <!-- Visualization 2: Topic vs Pipeline Time -->
-                <div class="visual-card">
-                    <h3>Topic vs Total Pipeline Time</h3>
-                    <img src="{{ url_for('static', filename=visuals.topic_time_plot) }}" 
-                         alt="Topic vs Pipeline Time"
-                         onclick="openModal(this.src)">
-                    <p>Compares processing time across different topics</p>
-                </div>
+                
 
                 <!-- Visualization 3: Difficulty vs Success Rate -->
                 <div class="visual-card">
@@ -460,13 +454,7 @@
                 </div>
 
                 <!-- Visualization 4: Model Version Comparison -->
-                <div class="visual-card">
-                    <h3>Model Version Comparison</h3>
-                    <img src="{{ url_for('static', filename=visuals.model_comparison_plot) }}" 
-                         alt="Model Version Comparison"
-                         onclick="openModal(this.src)">
-                    <p>Compares performance across model versions</p>
-                </div>
+                
 
                 <!-- Visualization 5: Error Type Frequency -->
                 <div class="visual-card">
@@ -489,12 +477,7 @@
         </div>
 
         <!-- Quick Insights -->
-        <div class="section">
-            <h2>Quick Insights</h2>
-            <div id="insights">
-                {{ insights|safe }}
-            </div>
-        </div>
+        
     </div>
 
     <!-- Modal for image zoom -->

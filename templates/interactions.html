@@ -455,13 +455,7 @@
                 </div>
 
                 <!-- Visualization 3: Difficulty Response Time -->
-                <div class="visual-card">
-                    <h3>Difficulty vs Response Time</h3>
-                    <img src="{{ url_for('static', filename=visuals.difficulty_response) }}" 
-                         alt="Difficulty vs Response Time"
-                         onclick="openModal(this.src)">
-                    <p>Response time distribution across different difficulty levels</p>
-                </div>
+                
 
                 <!-- Visualization 4: Hint Impact -->
                 <div class="visual-card">
@@ -482,23 +476,11 @@
                 </div>
 
                 <!-- Visualization 6: Confidence Calibration -->
-                <div class="visual-card">
-                    <h3>Confidence vs Accuracy Calibration</h3>
-                    <img src="{{ url_for('static', filename=visuals.confidence_accuracy) }}" 
-                         alt="Confidence vs Accuracy"
-                         onclick="openModal(this.src)">
-                    <p>Analysis of student confidence ratings compared to actual performance</p>
-                </div>
+                
             </div>
         </div>
 
         <!-- Quick Insights -->
-        <div class="section">
-            <h2>Quick Insights</h2>
-            <div id="insights">
-                {{ insights|safe }}
-            </div>
-        </div>
     </div>
 
     <!-- Modal for image zoom -->

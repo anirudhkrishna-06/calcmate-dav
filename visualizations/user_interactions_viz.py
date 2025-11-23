@@ -307,7 +307,7 @@ class UserInteractionsVisualizer:
         from sklearn.model_selection import train_test_split, cross_val_score
         from sklearn.linear_model import LogisticRegression
         from sklearn.preprocessing import StandardScaler
-        from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, log_loss
+        from sklearn.metrics import accuracy_score, classification_report, roc_auc_score, log_loss, r2_score
         from sklearn.ensemble import RandomForestClassifier
 
         df = self.df.copy()
@@ -630,10 +630,10 @@ class UserInteractionsVisualizer:
             insights.append(f"🚨 <strong>Low User Accuracy:</strong> Students struggling at {avg_accuracy:.1f}% accuracy - intervention needed")
         
         # Regression insight
-        if regression_results['r_squared'] > 0.3:
-            insights.append(f"📈 <strong>Strong Predictors:</strong> Study hours and previous scores strongly predict accuracy (R² = {regression_results['r_squared']:.3f})")
+        if regression_results['accuracy'] > 0.3:
+            insights.append(f"📈 <strong>Strong Predictors:</strong> Study hours and previous scores strongly predict accuracy (R² = {regression_results['accuracy']:.3f})")
         else:
-            insights.append(f"📊 <strong>Weak Predictors:</strong> Additional factors beyond study time affect performance (R² = {regression_results['r_squared']:.3f})")
+            insights.append(f"📊 <strong>Weak Predictors:</strong> Additional factors beyond study time affect performance (R² = {regression_results['accuracy']:.3f})")
         
         # Hypothesis test insight
         if hypothesis_results['p_value'] < 0.05:
